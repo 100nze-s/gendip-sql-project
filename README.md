@@ -14,7 +14,7 @@ La repository è organizzata come segue:
 ---
 
 ## 📊 Informazioni sul Dataset
-Il dataset traccia l'evoluzione delle nomine diplomatiche a livello globale in un arco temporale di oltre cinquant'anni (1968-2021), integrando variabili geografiche, caratteristiche istituzionali e indicatori politici avanzati (come la presenza femminile nei parlamenti e l'adozione di politiche estere femministe - FFP).
+Il dataset traccia l'evoluzione delle nomine diplomatiche a livello globale, copre più di 200 Paesi e 10 anni specifici tra il 1968 e il 2021, integrando caratteristiche istituzionali e indicatori politici avanzati (come la presenza femminile nei parlamenti e l'adozione di politiche estere femministe - FFP).
 - **Sorgente ufficiale:** [GenDip Project](https://www.gu.se)
 - **Codebook di riferimento:** Consultabile nella cartella `data/GenDip_Dataset_Codebook_vJune23_2023-06-13.pdf`
 
