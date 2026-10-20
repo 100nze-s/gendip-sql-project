@@ -23,4 +23,4 @@ Il dataset traccia l'evoluzione delle nomine diplomatiche a livello globale, cop
 ## 🛠️ Tecnologie Utilizzate
 - **Database Management System:** PostgreSQL & pgAdmin
 - **Linguaggio:** SQL
-- 
+- **Visualizzazione dati:** Excel
