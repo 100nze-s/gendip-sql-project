@@ -7,7 +7,7 @@ SCALETTA E STRUTTURA DELL'ANALISI:
 Il presente file raccoglie le query SQL eseguite su PostgreSQL (pgAdmin) per esplorare 
 il dataset "GenDip". L'analisi è suddivisa nelle seguenti fasi:
 
-1. FASE DI CONTROLLO E STATISTICHE DESCRittive GENERALI
+1. FASE DI CONTROLLO E STATISTICHE DESCRITTIVE GENERALI
     - Verifica della corretta importazione del dataset e conteggio dei record.
     - Distribuzione generale dei diplomatici per genere (gestione dei codici mancanti/sentinella).
 
@@ -24,12 +24,13 @@ il dataset "GenDip". L'analisi è suddivisa nelle seguenti fasi:
     - Relazione tra la rappresentanza femminile nei parlamenti interni e la carriera diplomatica estera.
 */
 
+
 ----------------------------------------------------------------------------------------------------
 -- FASE 0: CREAZIONE DELLA TABELLA E PREPARAZIONE / IMPORTAZIONE DEL DATASET CSV
 ----------------------------------------------------------------------------------------------------
 
 /*
-  DESCRIZIONE DEI PASSAGGI PRELIMINARI PER L'IMPORTAZIONE:
+  PASSAGGI PRELIMINARI PER L'IMPORTAZIONE:
   1. Preparazione del file: Prima dell'importazione su PostgreSQL, il dataset sorgente (GenDip_Dataset_1968-2021.xlsx) 
      è stato analizzato e convertito in formato CSV, verificando che la codifica dei caratteri fosse pulita 
      e che le colonne numeriche fossero compatibili (gestendo correttamente i codici mancanti o sentinella come '99' o '9999').
@@ -66,7 +67,7 @@ CREATE TABLE gendip_data (
 );
 
 ----------------------------------------------------------------------------------------------------
--- FASE 1: CONTROLLO E VERIFICA DELL'IMPORTAZIONE DEI DATI
+-- FASE 1: CONTROLLO E STATISTICHE DESCRITTIVE GENERALI
 ----------------------------------------------------------------------------------------------------
 
 -- Obiettivo: Verificare il corretto caricamento del dataset calcolando il numero totale di righe presenti nella tabella 'gendip_data'.
@@ -82,3 +83,37 @@ SELECT *
 FROM gendip_data
 LIMIT 5;
 
+-- Obiettivo: Analizzare la distribuzione complessiva dei diplomatici per genere all'interno del dataset, escludendo i codici mancanti (99) come indicato nel codebook ufficiale.
+-- Risultato atteso: Ottenere una tabella riepilogativa suddivisa tra uomini (0) e donne (1) con i relativi conteggi assoluti, permettendo di verificare il volume complessivo delle nomine classificate per genere.
+
+SELECT 
+    gender,
+    CASE 
+        WHEN gender = 0 THEN 'Uomini'
+        WHEN gender = 1 THEN 'Donne'
+        ELSE 'Altro / Sconosciuto'
+    END AS genere_label,
+    COUNT(*) AS numero_nomine
+FROM gendip_data
+WHERE gender <> 99
+GROUP BY gender
+ORDER BY gender;
+
+----------------------------------------------------------------------------------------------------
+-- FASE 2: TREND TEMPORALE ED EVOLUZIONE STORICA (1968 - 2021)
+----------------------------------------------------------------------------------------------------
+
+-- Obiettivo: Analizzare l'andamento temporale anno per anno della rappresentanza diplomatica femminile, calcolando il totale delle nomine e la percentuale di donne sul totale (escludendo i codici mancanti 99).
+-- Risultato atteso: Ottenere una serie storica ordinata per anno che mostri la crescita progressiva della percentuale di donne diplomatiche dal 1968 al 2021.
+
+SELECT 
+    year,
+    COUNT(CASE WHEN gender <> 99 THEN 1 END) AS totale_nomine_valide,
+    SUM(CASE WHEN gender = 1 THEN 1 ELSE 0 END) AS nomine_donne,
+    ROUND(
+        (SUM(CASE WHEN gender = 1 THEN 1 ELSE 0 END)::numeric / NULLIF(COUNT(CASE WHEN gender <> 99 THEN 1 END), 0)) * 100, 
+        2
+    ) AS percentuale_donne
+FROM gendip_data
+GROUP BY year
+ORDER BY year;
